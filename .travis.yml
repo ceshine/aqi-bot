@@ -1,0 +1,11 @@
+language: python
+python:
+  - "3.6"
+
+# command to install dependencies
+install:
+  - "pip install pytest python-telegram-bot==10.0.0 requests==2.18.4"
+
+# command to run tests
+script:
+  - python run_tests.py
