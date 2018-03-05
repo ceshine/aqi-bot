@@ -41,7 +41,7 @@ Currently the bot will lose track of all subscriptions if it is restarted.
 Adjust behaviors according to the pollution level.
 
 ### 3. More robust schedule
-Sometimes the update from an station can be delayed for more than 20 minutes(the maximum allowed delay in the current setting). Need a more
+Sometimes the update from an station can be delayed for more than 20 minutes(the maximum allowed delay in the current setting). Need a retry mechanism.
 
 ### 4. Testing Mechanism
 A public testing bot seems necessary. But has to consider ways to avoid abusing.
