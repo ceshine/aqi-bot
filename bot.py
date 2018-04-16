@@ -67,11 +67,12 @@ def error(bot, update, error):
 
 def broadcast_reading(bot, job):
     aqi_data = requests.get(
-        "http://api.waqi.info/feed/{}/?token={}".format(
+        "http://api.waqi.info/feed/@{}/?token={}".format(
             job.context["station"], AQI_TOKEN
         )
     ).json()['data']
-    logger.info("Triggered " + str(job.context))
+    logger.info("Triggered %s", str(job.context))
+    logger.info(aqi_data)
     text = (
         "{} - {}\nAQI: \t*{}*\nPM 2.5 AQI:\t *{}*"
         "\nConcentration: *{}* ug/m3").format(
@@ -106,7 +107,7 @@ def set_notification(bot, update, args, job_queue, chat_data):
         }
         # Remove existing
         if "job" in chat_data:
-            job.schedule_removal()
+            chat_data["job"].schedule_removal()
             del chat_data["job"]
         # Add job to queue
         job_queue.run_once(
@@ -129,12 +130,19 @@ def set_notification(bot, update, args, job_queue, chat_data):
 def unset(bot, update, chat_data):
     """Remove the job if the user changed their mind."""
     if 'job' not in chat_data:
-        update.message.reply_text("You have no active timer")
+        update.message.reply_text("You have no active notifier")
         return
     job = chat_data["job"]
     job.schedule_removal()
     del chat_data["job"]
     update.message.reply_text('Timer succefully unset!')
+
+
+def ondemand_broadcast(bot, update, chat_data):
+    if 'job' not in chat_data:
+        update.message.reply_text("You have no active notifier")
+        return
+    broadcast_reading(bot, chat_data["job"])
 
 
 def find_station(bot, update, args):
@@ -146,7 +154,7 @@ def find_station(bot, update, args):
                 lat, lng, AQI_TOKEN
             )
         ).json()['data']
-        logger.info("Find station: %f %f", lat, lng)
+        logger.info("Find station: %f %f", lat, lng, data)
         update.message.reply_text(
             "name: {} @ {};{} \n"
             "id: {}\n"
@@ -181,6 +189,8 @@ def main():
                                   pass_chat_data=True))
     dp.add_handler(CommandHandler("find", find_station,
                                   pass_args=True))
+    dp.add_handler(CommandHandler("get", ondemand_broadcast,
+                                  pass_chat_data=True))
     dp.add_handler(CommandHandler("unset", unset, pass_chat_data=True))
 
     # on noncommand i.e message - echo the message on Telegram
