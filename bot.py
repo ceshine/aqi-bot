@@ -4,6 +4,7 @@ Usage:
 * Use /find <lat> <lng> command to find the nearest station.
 * Use /set <station_id> command to subscribe
 * Use /unset command to unsubscribe
+* Use /get to get the latest reading for the subscribed station
 * Revert to the basic Echobot example (repeats messages) for others.
 
 Press Ctrl-C on the command line or send a signal to the process to stop the
