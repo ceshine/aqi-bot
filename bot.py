@@ -111,10 +111,6 @@ def set_notification(bot, update, args, job_queue, chat_data):
             chat_data["job"].schedule_removal()
             del chat_data["job"]
         # Add job to queue
-        job_queue.run_once(
-            broadcast_reading, 5,
-            context=context
-        )
         job = job_queue.run_repeating(
             broadcast_reading,
             3600,
