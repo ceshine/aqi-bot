@@ -1,4 +1,6 @@
 # aqi-bot
+[![Build Status](https://travis-ci.org/ceshine/aqi-bot.svg?branch=master)](https://travis-ci.org/ceshine/aqi-bot)
+
 A minimal Telegram AQI notification bot
 
 ## Set Up
