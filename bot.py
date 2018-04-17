@@ -15,6 +15,7 @@ import logging
 import datetime
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from retrying import retry
 import requests
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
@@ -66,14 +67,22 @@ def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
-def broadcast_reading(bot, job):
+@retry(stop_max_attempt_number=5, wait_fixed=5000)
+def get_reading(job):
     aqi_data = requests.get(
         "http://api.waqi.info/feed/@{}/?token={}".format(
             job.context["station"], AQI_TOKEN
         )
-    ).json()['data']
+    ).json()
+    if aqi_data["status"] != "ok":
+        logger.warning(aqi_data)
+        raise RuntimeError("Failed to get the reading from the API server.")
+    return aqi_data["data"]
+
+
+def broadcast_reading(bot, job):
     logger.info("Triggered %s", str(job.context))
-    logger.info(aqi_data)
+    aqi_data = get_reading(job)
     text = (
         "{} - {}\nAQI: \t*{}*\nPM 2.5 AQI:\t *{}*"
         "\nConcentration: *{}* ug/m3").format(
